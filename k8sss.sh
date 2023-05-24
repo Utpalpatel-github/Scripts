@@ -8,9 +8,30 @@ sudo apt install docker.io -y
 sudo systemctl start docker
 sudo systemctl enable docker
 
-sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+ * sudo usermod -aG docker ubuntu
+ * sudo systemctl restart docker
+ 
+Disable swap memory:
+ *sudo swapoff -a
+ 
+Comment out the swap entry in /etc/fstab:
+ *sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+ 
+Enable bridged traffic to pass through iptables:
+*sudo sysctl net.bridge.bridge-nf-call-iptables=1
 
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+Import the Kubernetes repository signing key:
+*curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+Add the Kubernetes repository:
+*cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+
+// sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+// echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt update -y
 sudo apt install kubeadm=1.20.0-00 kubectl=1.20.0-00 kubelet=1.20.0-00 -y
